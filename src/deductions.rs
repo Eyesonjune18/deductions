@@ -1,8 +1,10 @@
+use crate::Proposition;
+
 use std::collections::HashMap;
 
 // Stores all the given or working propositions on a stack
 pub struct Deduction {
-    proposition_stack: Vec<String>,
+    proposition_stack: Vec<Proposition>,
     proposition_values: ValueMap,
 }
 
@@ -22,7 +24,7 @@ impl Deduction {
 
     // Creates a Deduction from a vector of propositions
     pub fn from_strs(propositions: Vec<&str>) -> Self {
-        let proposition_stack: Vec<String> = propositions.iter().map(|x| x.to_string()).collect();
+        let proposition_stack: Vec<Proposition> = propositions.iter().map(|x| Proposition::from_str(x)).collect();
         let proposition_values = ValueMap::from_proposition_stack(&proposition_stack);
 
         Self {
@@ -47,11 +49,11 @@ impl ValueMap {
 
     // Finds all the propositions in the given stack and initializes them to None
     // This is used to create a Deduction from a vector of propositions
-    fn from_proposition_stack(proposition_stack: &Vec<String>) -> Self {
+    fn from_proposition_stack(proposition_stack: &Vec<Proposition>) -> Self {
         let mut values = HashMap::new();
 
         for proposition in proposition_stack {
-            for character in proposition.chars() {
+            for character in proposition.get_string().chars() {
                 if character.is_alphabetic() {
                     values.insert(character, None);
                 }

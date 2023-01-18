@@ -1,8 +1,10 @@
 #![allow(dead_code, unused_variables)]
 
+mod propositions;
 mod deductions;
 mod history;
 
+use propositions::Proposition;
 use deductions::Deduction;
 use history::EvaluationHistory;
 
