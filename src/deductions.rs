@@ -63,9 +63,7 @@ impl ValueMap {
             }
         }
 
-        Self {
-            values,
-        }
+        Self { values }
     }
 
     // Returns the value map
