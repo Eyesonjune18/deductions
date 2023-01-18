@@ -8,7 +8,7 @@ pub struct Deduction {
 
 // Stores the values of the propositions used in the given deduction
 struct ValueMap {
-    values: HashMap<char, bool>
+    values: HashMap<char, Option<bool>>
 }
 
 impl Deduction {
@@ -22,9 +22,12 @@ impl Deduction {
 
     // Creates a Deduction from a vector of propositions
     pub fn from_strs(propositions: Vec<&str>) -> Self {
+        let proposition_stack: Vec<String> = propositions.iter().map(|x| x.to_string()).collect();
+        let proposition_values = ValueMap::from_proposition_stack(&proposition_stack);
+
         Self {
-            proposition_stack: propositions.iter().map(|x| x.to_string()).collect(),
-            proposition_values: ValueMap::new(),
+            proposition_stack,
+            proposition_values,
         }
     }
 
@@ -39,6 +42,24 @@ impl ValueMap {
     fn new() -> Self {
         Self {
             values: HashMap::new(),
+        }
+    }
+
+    // Finds all the propositions in the given stack and initializes them to None
+    // This is used to create a Deduction from a vector of propositions
+    fn from_proposition_stack(proposition_stack: &Vec<String>) -> Self {
+        let mut values = HashMap::new();
+
+        for proposition in proposition_stack {
+            for character in proposition.chars() {
+                if character.is_alphabetic() {
+                    values.insert(character, None);
+                }
+            }
+        }
+
+        Self {
+            values,
         }
     }
 }
