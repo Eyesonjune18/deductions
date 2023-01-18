@@ -60,10 +60,28 @@ impl Deduction {
         }
     }
 
+    // // Removes all the propositions which have been collapsed to "T" or "F"
+    // pub fn trim(&mut self) {
+    //     let mut removal_indexes: Vec<usize> = Vec::new();
+
+    //     for (i, proposition) in self.proposition_stack.iter_mut().enumerate() {
+    //         if proposition.get_string() == "T" || proposition.get_string() == "F" {
+    //             removal_indexes.push(i);
+    //         }
+    //     }
+
+    //     for i in removal_indexes {
+    //         self.proposition_stack.remove(i);
+    //     }
+    // }
+
     // Finds and updates all of the actual truth values of the root propositions
     // Only finds values for propositions which have been collapsed to "p" or "!p"
+    // Removes the propositions whose values have been determined from the stack
     pub fn update_actual_values(&mut self) {
-        for p in &self.proposition_stack {
+        let mut removal_indexes: Vec<usize> = Vec::new();
+
+        for (i, p) in self.proposition_stack.iter().enumerate() {
             let proposition_string = p.get_string();
             
             // The proposition can only be a root proposition value if it is one or two characters long
@@ -82,6 +100,12 @@ impl Deduction {
                 }
                 _ => continue,
             };
+
+            removal_indexes.push(i);
+        }
+
+        for i in removal_indexes {
+            self.proposition_stack.remove(i);
         }
     }
 }

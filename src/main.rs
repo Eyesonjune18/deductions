@@ -15,5 +15,5 @@ fn main() {
     deduction.update_actual_values();
     deduction.substitute_all();
 
-    println!("{}", deduction);
+    println!("{}", &deduction);
 }
