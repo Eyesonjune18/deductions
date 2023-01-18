@@ -14,7 +14,7 @@ impl EvaluationHistory {
     }
 
     // Adds a Deduction to the history
-    pub fn push(&mut self, deduction: Deduction) {
+    fn push(&mut self, deduction: Deduction) {
         self.old_deduction_stacks.push(deduction);
     }
 }
