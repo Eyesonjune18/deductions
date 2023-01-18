@@ -47,7 +47,7 @@ impl ValueMap {
         }
     }
 
-    // Finds all the rpot propositions in the given stack and initializes them to None
+    // Finds all the root propositions in the given stack and initializes them to None
     // This is used to create a Deduction from a vector of propositions
     fn from_proposition_stack(proposition_stack: &Vec<Proposition>) -> Self {
         let mut values = HashMap::new();

@@ -27,7 +27,7 @@ impl Proposition {
 
     // Substitutes all the root propositions with their actual
     // truth values (encoded in "TRUE" and "FALSE") if known
-    // TODO: This might be better represented by a data structure rather than Stringss
+    // TODO: This might be better represented by a data structure rather than Strings
     pub fn substitute(&mut self, values: &ValueMap) {
         todo!()
     }
