@@ -51,6 +51,39 @@ impl Deduction {
     fn is_empty(&self) -> bool {
         self.proposition_stack.is_empty()
     }
+
+    // Substitutes all root propositions with their actual truth values, if known
+    // TODO: This should not be public, but it is for testing
+    pub fn substitute_all(&mut self) {
+        for proposition in &mut self.proposition_stack {
+            proposition.substitute(&self.proposition_values);
+        }
+    }
+
+    // Finds and updates all of the actual truth values of the root propositions
+    // Only finds values for propositions which have been collapsed to "p" or "!p"
+    pub fn update_actual_values(&mut self) {
+        for p in &self.proposition_stack {
+            let proposition_string = p.get_string();
+            
+            // The proposition can only be a root proposition value if it is one or two characters long
+            match proposition_string.len() {
+                1 => {
+                    // If the proposition is one character long, the first and only character
+                    // is the root proposition ("p" etc.) and its value is TRUE
+                    let proposition_char = proposition_string.chars().next().unwrap();
+                    self.proposition_values.set_value(proposition_char, Some(true));
+                },
+                2 => {
+                    // If the proposition is two characters long, the second character
+                    // is the root proposition ("!p" etc.) and its value is FALSE
+                    let proposition_char = proposition_string.chars().last().expect("[INTERNAL ERROR] Could not find the last character of the proposition string");
+                    self.proposition_values.set_value(proposition_char, Some(false));
+                }
+                _ => continue,
+            };
+        }
+    }
 }
 
 impl ValueMap {
@@ -68,8 +101,9 @@ impl ValueMap {
 
         for proposition in proposition_stack {
             for character in proposition.get_string().chars() {
-                if character.is_alphabetic() {
+                if character.is_lowercase() {
                     values.insert(character, None);
+                    // values.insert(character, Some(false));
                 }
             }
         }
@@ -80,6 +114,11 @@ impl ValueMap {
     // Returns the value map
     pub fn get_values(&self) -> &HashMap<char, Option<bool>> {
         &self.values
+    }
+
+    // Sets the value of a root proposition
+    pub fn set_value(&mut self, proposition: char, value: Option<bool>) {
+        self.values.insert(proposition, value);
     }
 }
 

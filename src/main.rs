@@ -6,12 +6,14 @@ mod propositions;
 
 use deductions::Deduction;
 use deductions::ValueMap;
-use history::EvaluationHistory;
 use propositions::Proposition;
 
 fn main() {
     let propositions = ["(m & b) > j", "(f | s) > m", "b > t", "f > !t", "f"].to_vec();
-    let deduction = Deduction::from_strs(propositions);
+    let mut deduction = Deduction::from_strs(propositions);
 
-    let history = EvaluationHistory::new();
+    deduction.update_actual_values();
+    deduction.substitute_all();
+
+    println!("{}", deduction);
 }
