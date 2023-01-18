@@ -5,6 +5,12 @@ pub struct Proposition {
     proposition_string: String,
 }
 
+impl std::fmt::Display for Proposition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.proposition_string)
+    }
+}
+
 impl Proposition {
     // Creates an empty Proposition
     fn new() -> Self {
