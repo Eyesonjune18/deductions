@@ -13,6 +13,16 @@ pub struct ValueMap {
     values: HashMap<char, Option<bool>>,
 }
 
+impl std::fmt::Display for Deduction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for proposition in &self.proposition_stack {
+            writeln!(f, "{}", proposition)?;
+        }
+
+        Ok(())
+    }
+}
+
 impl Deduction {
     // Creates an empty Deduction
     fn new() -> Self {
