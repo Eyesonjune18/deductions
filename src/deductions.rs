@@ -9,7 +9,7 @@ pub struct Deduction {
 }
 
 // Stores the values of the root propositions used in the given deduction
-struct ValueMap {
+pub struct ValueMap {
     values: HashMap<char, Option<bool>>
 }
 

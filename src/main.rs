@@ -6,6 +6,7 @@ mod history;
 
 use propositions::Proposition;
 use deductions::Deduction;
+use deductions::ValueMap;
 use history::EvaluationHistory;
 
 fn main() {

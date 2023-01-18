@@ -1,3 +1,5 @@
+use crate::ValueMap;
+
 // Encodes a proposition string
 pub struct Proposition {
     proposition_string: String,
@@ -21,5 +23,17 @@ impl Proposition {
     // Returns the proposition string
     pub fn get_string(&self) -> &str {
         &self.proposition_string
+    }
+
+    // Substitutes all the root propositions with their actual
+    // truth values (encoded in "TRUE" and "FALSE") if known
+    // TODO: This might be better represented by a data structure rather than Stringss
+    pub fn substitute(&mut self, values: &ValueMap) {
+        todo!()
+    }
+
+    // Collapses the proposition string based on actual truth values
+    pub fn collapse(&mut self) {
+        todo!()
     }
 }
