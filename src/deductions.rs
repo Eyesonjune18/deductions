@@ -64,4 +64,9 @@ impl ValueMap {
             values,
         }
     }
+
+    // Returns the value map
+    pub fn get_values(&self) -> &HashMap<char, Option<bool>> {
+        &self.values
+    }
 }
