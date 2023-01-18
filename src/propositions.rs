@@ -38,7 +38,7 @@ impl Proposition {
     pub fn substitute(&mut self, values: &ValueMap) {
         for (proposition_char, value) in values.get_values() {
             if let Some(value) = value {
-                let value = if *value { "TRUE" } else { "FALSE" };
+                let value = if *value { "T" } else { "F" };
 
                 self.proposition_string = self.proposition_string.replace(*proposition_char, value);
             }
