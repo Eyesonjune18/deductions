@@ -6,6 +6,7 @@ pub struct Proposition {
 }
 
 impl std::fmt::Display for Proposition {
+    // Displays the proposition string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.proposition_string)
     }

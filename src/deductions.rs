@@ -14,6 +14,7 @@ pub struct ValueMap {
 }
 
 impl std::fmt::Display for Deduction {
+    // Displays all the propositions in the Deduction
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for proposition in &self.proposition_stack {
             writeln!(f, "{}", proposition)?;
