@@ -24,7 +24,10 @@ impl Deduction {
 
     // Creates a Deduction from a vector of propositions
     pub fn from_strs(propositions: Vec<&str>) -> Self {
-        let proposition_stack: Vec<Proposition> = propositions.iter().map(|x| Proposition::from_str(x)).collect();
+        let proposition_stack: Vec<Proposition> = propositions
+            .iter()
+            .map(|x| Proposition::from_str(x))
+            .collect();
         let proposition_values = ValueMap::from_proposition_stack(&proposition_stack);
 
         Self {
@@ -70,3 +73,53 @@ impl ValueMap {
         &self.values
     }
 }
+
+/*
+(m ∧ ¬b) → j
+(f ∨ s) → m
+b → t
+f → ¬t
+f
+∴ j
+
+=>
+(m ∧ ¬b) → j
+(f ∨ s) → m
+b → t
+f → ¬t
+f = TRUE
+
+=>
+(m ∧ ¬b) → j
+(TRUE ∨ s) → m
+b → t
+TRUE → ¬t
+
+=>
+(m ∧ ¬b) → j
+TRUE → m
+b → t
+t = FALSE
+
+
+=>
+(m ∧ ¬b) → j
+m = TRUE
+b → FALSE
+
+=>
+(TRUE ∧ ¬b) → j
+b = FALSE
+
+=>
+(TRUE ∧ ¬FALSE) → j
+
+=>
+(TRUE ∧ TRUE) → j
+
+=>
+TRUE → j
+
+=>
+j = TRUE
+*/
