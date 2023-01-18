@@ -29,7 +29,13 @@ impl Proposition {
     // truth values (encoded in "TRUE" and "FALSE") if known
     // TODO: This might be better represented by a data structure rather than Strings
     pub fn substitute(&mut self, values: &ValueMap) {
-        todo!()
+        for (proposition_char, value) in values.get_values() {
+            if let Some(value) = value {
+                let value = if *value { "TRUE" } else { "FALSE" };
+
+                self.proposition_string = self.proposition_string.replace(*proposition_char, value);
+            }
+        }
     }
 
     // Collapses the proposition string based on actual truth values
