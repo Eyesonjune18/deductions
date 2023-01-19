@@ -24,12 +24,22 @@ impl std::fmt::Display for Deduction {
     }
 }
 
-impl Deduction {
-    // Creates an empty Deduction
-    fn new() -> Self {
+impl Default for Deduction {
+    // Creates an empty Deduction 
+    fn default() -> Self {
         Self {
             expression_stack: Vec::new(),
-            proposition_values: ValueMap::new(),
+            proposition_values: ValueMap::default(),
+        }
+    }
+}
+
+impl Deduction {
+    // Creates a new Deduction from the given fields
+    fn new(expression_stack: Vec<Expression>, proposition_values: ValueMap) -> Self {
+        Self {
+            expression_stack,
+            proposition_values,
         }
     }
 
@@ -37,14 +47,11 @@ impl Deduction {
     pub fn from_strs(expressions: Vec<&str>) -> Self {
         let expression_stack: Vec<Expression> = expressions
             .iter()
-            .map(|x| Expression::from_str(x))
+            .map(|x| Expression::parse_str(x))
             .collect();
         let proposition_values = ValueMap::from_expression_stack(&expression_stack);
 
-        Self {
-            expression_stack,
-            proposition_values,
-        }
+        Self::new(expression_stack, proposition_values)
     }
 
     // Checks if the Deduction is empty
@@ -98,11 +105,20 @@ impl Deduction {
     }
 }
 
-impl ValueMap {
+impl Default for ValueMap {
     // Creates an empty ValueMap
-    fn new() -> Self {
+    fn default() -> Self {
         Self {
             values: HashMap::new(),
+        }
+    }
+}
+
+impl ValueMap {
+    // Creates a new ValueMap from the given fields
+    fn new(values: HashMap<char, Option<bool>>) -> Self {
+        Self {
+            values,
         }
     }
 
