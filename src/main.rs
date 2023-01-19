@@ -2,22 +2,14 @@
 
 mod deductions;
 mod history;
-mod propositions;
+mod expressions;
 
 use deductions::Deduction;
-use deductions::ValueMap;
-use propositions::Proposition;
+use expressions::Expression;
 
 fn main() {
     let propositions = ["(m & b) > j", "(f | s) > m", "b > t", "f > !t", "f"].to_vec();
     let mut deduction = Deduction::from_strs(propositions);
-
-    println!("{}", &deduction);
-
-    deduction.update_actual_values();
-    deduction.substitute_all();
-
-    println!("{}", &deduction);
 }
 
 /*
