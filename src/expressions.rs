@@ -1,3 +1,5 @@
+use crate::ValueMap;
+
 // Represents a propositional logic expression through an abstract syntax tree
 pub struct Expression {
     origin_string: String,
@@ -5,7 +7,7 @@ pub struct Expression {
 }
 
 // Represents nodes in the expression tree
-enum ExpressionNode {
+pub enum ExpressionNode {
     Proposition(char),
     TruthValue(bool),
     Operator(Operator),
@@ -13,7 +15,7 @@ enum ExpressionNode {
 }
 
 // Represents one of 4 required operators for this project
-enum Operator {
+pub enum Operator {
     Not,
     And,
     Or,
@@ -30,17 +32,38 @@ impl std::fmt::Display for Expression {
 }
 
 impl Expression {
-    fn new() -> Self {
+    // Creates a new Expression from the given fields
+    fn new(origin_string: String, nodes: Vec<ExpressionNode>) -> Self {
         Self {
-            origin_string: String::new(),
-            nodes: Vec::new(),
+            origin_string,
+            nodes,
         }
     }
 
-    fn from_str(expression_string: &str) -> Self {
-        Self {
-            origin_string: expression_string.to_string(),
-            nodes: Vec::new(),
+    // Creates an Expression from a string
+    pub fn parse_str(expression_string: &str) -> Self {
+        todo!()
+    }
+
+    // Returns the nodes in the Expression
+    pub fn get_nodes(&self) -> &Vec<ExpressionNode> {
+        &self.nodes
+    }
+
+    // Substitutes all Proposition nodes with their actual truth values, if known
+    pub fn substitute(&mut self, proposition_values: &ValueMap) {
+        for node in &mut self.nodes {
+            match node {
+                ExpressionNode::Proposition(proposition) => {
+                    if let Some(value) = proposition_values.get_value(*proposition) {
+                        *node = ExpressionNode::TruthValue(value);
+                    }
+                }
+                ExpressionNode::Subexpression(subexpression) => {
+                    subexpression.substitute(proposition_values);
+                }
+                _ => (),
+            }
         }
     }
 }

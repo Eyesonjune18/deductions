@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::Expression;
+use crate::ExpressionNode;
 
 // Stores all the given or working expressions on a stack
 pub struct Deduction {
@@ -25,7 +26,7 @@ impl std::fmt::Display for Deduction {
 }
 
 impl Default for Deduction {
-    // Creates an empty Deduction 
+    // Creates an empty Deduction
     fn default() -> Self {
         Self {
             expression_stack: Vec::new(),
@@ -117,33 +118,28 @@ impl Default for ValueMap {
 impl ValueMap {
     // Creates a new ValueMap from the given fields
     fn new(values: HashMap<char, Option<bool>>) -> Self {
-        Self {
-            values,
-        }
+        Self { values }
     }
 
     // Finds all the root propositions in the given stack and initializes them to None
     // This is used to create a Deduction from a vector of propositions
     fn from_expression_stack(expression_stack: &Vec<Expression>) -> Self {
-        let mut values = HashMap::new();
+        let mut values: HashMap<char, Option<bool>> = HashMap::new();
 
-        // TODO: Rewrite this
-
-        // for proposition in expression_stack {
-        //     for character in proposition.get_string().chars() {
-        //         if character.is_lowercase() {
-        //             values.insert(character, None);
-        //             // values.insert(character, Some(false));
-        //         }
-        //     }
-        // }
+        for expression in expression_stack {
+            for node in expression.get_nodes() {
+                if let ExpressionNode::Proposition(proposition_char) = node {
+                    values.insert(*proposition_char, None);
+                }
+            }
+        }
 
         Self { values }
     }
 
-    // Returns the value map
-    fn get_values(&self) -> &HashMap<char, Option<bool>> {
-        &self.values
+    // Gets the value of a root proposition, if known
+    pub fn get_value(&self, proposition: char) -> Option<bool> {
+        *self.values.get(&proposition).expect("[INTERNAL ERROR] Attempted to find the value of a proposition which does not exist in the ValueMap")
     }
 
     // Sets the value of a root proposition

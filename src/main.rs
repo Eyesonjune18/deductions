@@ -1,15 +1,17 @@
 #![allow(dead_code, unused_variables)]
 
 mod deductions;
-mod history;
 mod expressions;
+mod history;
 
 use deductions::Deduction;
+use deductions::ValueMap;
 use expressions::Expression;
+use expressions::ExpressionNode;
 
 fn main() {
     let propositions = ["(m & b) > j", "(f | s) > m", "b > t", "f > !t", "f"].to_vec();
-    let mut deduction = Deduction::from_strs(propositions);
+    let deduction = Deduction::from_strs(propositions);
 }
 
 /*
