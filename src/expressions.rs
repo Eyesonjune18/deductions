@@ -22,6 +22,8 @@ enum Operator {
 
 impl std::fmt::Display for Expression {
     // Displays the expression as a string
+    // TODO: Implement Display for each node so the current version
+    // can be displayed, rather than just the original string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.origin_string)
     }
