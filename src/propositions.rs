@@ -45,8 +45,15 @@ impl Proposition {
         }
     }
 
-    // Collapses the proposition string based on actual truth values
+    // Collapses any subpropositions that can be evaluated based on actual truth values
     pub fn collapse(&mut self) {
-        todo!()
+        // Collapse "(T & T)" to T
+        self.proposition_string = self.proposition_string.replace("(T & T)", "T");
+        // Collapse "(T & F)" to F
+        self.proposition_string = self.proposition_string.replace("(T & F)", "F");
+        // Collapse "(F & T)" to F
+        self.proposition_string = self.proposition_string.replace("(F & T)", "F");
+        // Collapse "(F & F)" to F
+        self.proposition_string = self.proposition_string.replace("(F & F)", "F");
     }
 }

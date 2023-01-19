@@ -47,7 +47,6 @@ TRUE → m [EVALUATE]
 b → t
 t = FALSE [EVALUATE]
 
-
 =>
 (m ∧ ¬b) → j
 m = TRUE [EVALUATE]

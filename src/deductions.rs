@@ -68,20 +68,22 @@ impl Deduction {
 
         for (i, p) in self.proposition_stack.iter().enumerate() {
             let proposition_string = p.get_string();
-            
+
             // The proposition can only be a root proposition value if it is one or two characters long
             match proposition_string.len() {
                 1 => {
                     // If the proposition is one character long, the first and only character
                     // is the root proposition ("p" etc.) and its value is TRUE
                     let proposition_char = proposition_string.chars().next().unwrap();
-                    self.proposition_values.set_value(proposition_char, Some(true));
-                },
+                    self.proposition_values
+                        .set_value(proposition_char, Some(true));
+                }
                 2 => {
                     // If the proposition is two characters long, the second character
                     // is the root proposition ("!p" etc.) and its value is FALSE
                     let proposition_char = proposition_string.chars().last().expect("[INTERNAL ERROR] Could not find the last character of the proposition string");
-                    self.proposition_values.set_value(proposition_char, Some(false));
+                    self.proposition_values
+                        .set_value(proposition_char, Some(false));
                 }
                 _ => continue,
             };
