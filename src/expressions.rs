@@ -30,15 +30,20 @@ pub enum Operator {
 impl Display for Expression {
     // Displays the expression as a string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut formatted_nodes = Vec::new();
-
-        for node in &self.nodes {
-            formatted_nodes.push(format!("{}", node));
+        // Join all nodes together with a space except for not operators
+        for (i, node) in self.nodes.iter().enumerate() {
+            // Don't print a space before the first node
+            if i == 0 {
+                write!(f, "{}", node)?;
+            } else {
+                match self.nodes[i - 1] {
+                    ExpressionNode::Operator(Operator::Not) => write!(f, "{}", node)?,
+                    _ => write!(f, " {}", node)?,
+                }
+            }
         }
 
-        let formatted_string = formatted_nodes.join(" ");
-
-        write!(f, "{}", formatted_string)
+        Ok(())
     }
 }
 
