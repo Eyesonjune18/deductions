@@ -42,7 +42,34 @@ impl Expression {
 
     // Creates an Expression from a string
     pub fn parse_str(expression_string: &str) -> Self {
-        todo!()
+        let mut nodes = Vec::new();
+
+        let mut expression_chars = expression_string.char_indices();
+
+        while let Some((i, c)) = expression_chars.next() {
+            match c {
+                ' ' => (),
+                // If a subexpression is found, parse it recursively
+                '(' => {
+                    // Collect the subexpression string to be parsed
+                    let subexpression_string = get_subexpression_string(&expression_string[i..]);
+
+                    nodes.push(ExpressionNode::Subexpression(Self::parse_str(&subexpression_string)));
+
+                    // Skip the characters in the subexpression
+                    expression_chars.nth(subexpression_string.len());
+                }
+                ')' => (),
+                '¬' | '!' => nodes.push(ExpressionNode::Operator(Operator::Not)),
+                '∧' | '&' => nodes.push(ExpressionNode::Operator(Operator::And)),
+                '∨' | '|' => nodes.push(ExpressionNode::Operator(Operator::Or)),
+                '→' | '>' => nodes.push(ExpressionNode::Operator(Operator::Implies)),
+                'a'..='z' => nodes.push(ExpressionNode::Proposition(c)),
+                _ => panic!("Invalid character in expression: '{}'", c),
+            }
+        }
+
+        Self::new(expression_string.to_string(), nodes)
     }
 
     // Returns the nodes in the Expression
@@ -66,4 +93,27 @@ impl Expression {
             }
         }
     }
+}
+
+// Returns the first subexpression found in the given expression string
+fn get_subexpression_string(expression_string: &str) -> String {
+    let mut subexpression_string = String::new();
+    let mut depth = 1;
+
+    for character in expression_string.chars() {
+        match character {
+            '(' => depth += 1,
+            ')' => depth -= 1,
+            _ => (),
+        }
+        
+        // If the depth is 0, the subexpression has been collected
+        if depth == 0 {
+            break;
+        }
+
+        subexpression_string.push(character);
+    }
+
+    subexpression_string
 }
