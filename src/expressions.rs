@@ -27,10 +27,42 @@ pub enum Operator {
 
 impl std::fmt::Display for Expression {
     // Displays the expression as a string
-    // TODO: Implement Display for each node so the current version
-    // can be displayed, rather than just the original string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.origin_string)
+        // Format each node in the expression
+        let mut formatted_nodes = Vec::new();
+
+        for node in &self.nodes {
+            formatted_nodes.push(format!("{}", node));
+        }
+
+        // Join the formatted nodes into a string
+        let formatted_string = formatted_nodes.join(" ");
+
+        write!(f, "{}", formatted_string)
+    }
+}
+
+impl std::fmt::Display for ExpressionNode {
+    // Displays the node as a string
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ExpressionNode::Proposition(proposition) => write!(f, "{}", proposition),
+            ExpressionNode::TruthValue(value) => write!(f, "{}", value),
+            ExpressionNode::Operator(operator) => write!(f, "{}", operator),
+            ExpressionNode::Subexpression(subexpression) => write!(f, "({})", subexpression),
+        }
+    }
+}
+
+impl std::fmt::Display for Operator {
+    // Displays the operator as a string
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Operator::Not => write!(f, "¬"),
+            Operator::And => write!(f, "∧"),
+            Operator::Or => write!(f, "∨"),
+            Operator::Implies => write!(f, "→"),
+        }
     }
 }
 
