@@ -5,7 +5,6 @@ use crate::ValueMap;
 // Represents a propositional logic expression through an abstract syntax tree
 #[derive(Debug, Eq, PartialEq)]
 pub struct Expression {
-    origin_string: String,
     nodes: Vec<ExpressionNode>,
 }
 
@@ -19,7 +18,7 @@ pub enum ExpressionNode {
 }
 
 // Represents one of 4 required operators for this project
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum Operator {
     Not,
     And,
@@ -73,11 +72,8 @@ impl Display for Operator {
 
 impl Expression {
     // Creates a new Expression from the given fields
-    fn new(origin_string: String, nodes: Vec<ExpressionNode>) -> Self {
-        Self {
-            origin_string,
-            nodes,
-        }
+    fn new(nodes: Vec<ExpressionNode>) -> Self {
+        Self { nodes }
     }
 
     // Creates an Expression from a string
@@ -111,12 +107,24 @@ impl Expression {
             }
         }
 
-        Self::new(expression_string.to_string(), nodes)
+        Self::new(nodes)
     }
 
     // Returns the nodes in the Expression
     pub fn get_nodes(&self) -> &Vec<ExpressionNode> {
         &self.nodes
+    }
+
+    // Checks whether a given Expression is a root proposition such as "p" or "¬p",
+    // and if it is, returns the proposition's character and its truth value
+    pub fn get_value_if_root_proposition(&self) -> Option<(char, bool)> {
+        match self.nodes.len() {
+            1 => Some((self.nodes[0].is_proposition()?, true)),
+            2 if matches!(self.nodes[0].is_operator()?, Operator::Not) => {
+                Some((self.nodes[1].is_proposition()?, false))
+            }
+            _ => None,
+        }
     }
 
     // Substitutes all Proposition nodes with their actual truth values, if known
@@ -163,6 +171,22 @@ fn get_subexpression_string(expression_string: &str) -> String {
     }
 
     subexpression_string
+}
+
+impl ExpressionNode {
+    fn is_proposition(&self) -> Option<char> {
+        match self {
+            ExpressionNode::Proposition(p) => Some(*p),
+            _ => None,
+        }
+    }
+
+    fn is_operator(&self) -> Option<Operator> {
+        match self {
+            ExpressionNode::Operator(o) => Some(*o),
+            _ => None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -245,7 +269,7 @@ mod tests {
             expression.get_nodes()[1],
             ExpressionNode::Operator(Operator::Implies)
         );
-        
+
         assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('j'));
     }
 

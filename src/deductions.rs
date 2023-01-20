@@ -10,6 +10,7 @@ pub struct Deduction {
 }
 
 // Stores all known root proposition values in the Deduction
+#[derive(Debug)]
 pub struct ValueMap {
     values: HashMap<char, Option<bool>>,
 }
@@ -60,8 +61,14 @@ impl Deduction {
         self.expression_stack.is_empty()
     }
 
+    // Returns the proposition values
+    pub fn get_values(&self) -> &ValueMap {
+        &self.proposition_values
+    }
+
     // Substitutes all root propositions with their actual truth values, if known
-    fn substitute_all(&mut self) {
+    // * This should not be public but it is for testing purposes *
+    pub fn substitute_all(&mut self) {
         for expression in &mut self.expression_stack {
             expression.substitute(&self.proposition_values);
         }
@@ -70,8 +77,14 @@ impl Deduction {
     // Finds and updates all of the actual truth values of the root propositions
     // Only finds values for propositions which have been collapsed to "p" or "!p"
     // Removes the propositions whose values have been determined from the stack
-    fn update_actual_values(&mut self) {
-        todo!()
+    // * This should not be public but it is for testing purposes *
+    // TODO: Write test cases for this!
+    pub fn update_actual_values(&mut self) {
+        for expression in &mut self.expression_stack {
+            if let Some((proposition_char, proposition_value)) = expression.get_value_if_root_proposition() {
+                self.proposition_values.set_value(proposition_char, Some(proposition_value));
+            }
+        }
     }
 }
 
@@ -93,14 +106,24 @@ impl ValueMap {
     // Finds all the root propositions in the given stack and initializes them to None
     // This is used to create a Deduction from a vector of propositions
     fn from_expression_stack(expression_stack: &Vec<Expression>) -> Self {
-        let mut values: HashMap<char, Option<bool>> = HashMap::new();
+        let mut values = HashMap::new();
 
-        for expression in expression_stack {
-            for node in expression.get_nodes() {
-                if let ExpressionNode::Proposition(proposition_char) = node {
-                    values.insert(*proposition_char, None);
+        fn inner<'a>(values: &mut HashMap<char, Option<bool>>, expression: impl Iterator<Item = &'a ExpressionNode>) {
+            for node in expression {
+                match node {
+                    ExpressionNode::Proposition(proposition_char) => {
+                        values.insert(*proposition_char, None);
+                    },
+                    ExpressionNode::Subexpression(subexpression) => {
+                        inner(values, subexpression.get_nodes().iter());
+                    },
+                    _ => (),
                 }
             }
+        }
+        
+        for expression in expression_stack {
+            inner(&mut values, expression.get_nodes().iter());
         }
 
         Self { values }
@@ -109,8 +132,7 @@ impl ValueMap {
     // Gets the value of a root proposition, if known
     pub fn get_value(&self, proposition: char) -> Option<bool> {
         *self.values.get(&proposition)
-        .expect("[INTERNAL ERROR] Attempted to find the value of a proposition which does not exist in the ValueMap
-        Was the ValueMap initialized correctly?")
+        .expect(format!("[INTERNAL ERROR] Attempted to find the value of a proposition '{}' which does not exist in the ValueMap. Was it initialized correctly?", proposition).as_str())
     }
 
     // Sets the value of a root proposition
