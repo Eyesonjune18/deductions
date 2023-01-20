@@ -57,7 +57,9 @@ impl Expression {
                     // Collect the subexpression string to be parsed
                     let subexpression_string = get_subexpression_string(&expression_string[i..]);
 
-                    nodes.push(ExpressionNode::Subexpression(Self::parse_str(&subexpression_string)));
+                    nodes.push(ExpressionNode::Subexpression(Self::parse_str(
+                        &subexpression_string,
+                    )));
 
                     // Skip the characters in the subexpression
                     expression_chars.nth(subexpression_string.len());
@@ -109,7 +111,7 @@ fn get_subexpression_string(expression_string: &str) -> String {
             ')' => depth -= 1,
             _ => (),
         }
-        
+
         // If the depth is 0, the subexpression has been collected
         if depth == 0 {
             break;
@@ -143,16 +145,34 @@ mod tests {
 
         assert_eq!(expression.get_nodes().len(), 5);
         assert_eq!(expression.get_nodes()[0], ExpressionNode::Proposition('a'));
-        assert_eq!(expression.get_nodes()[1], ExpressionNode::Operator(Operator::And));
+        assert_eq!(
+            expression.get_nodes()[1],
+            ExpressionNode::Operator(Operator::And)
+        );
         assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('b'));
-        assert_eq!(expression.get_nodes()[3], ExpressionNode::Operator(Operator::Or));
-        assert!(matches!(expression.get_nodes()[4], ExpressionNode::Subexpression(_)));
+        assert_eq!(
+            expression.get_nodes()[3],
+            ExpressionNode::Operator(Operator::Or)
+        );
+        assert!(matches!(
+            expression.get_nodes()[4],
+            ExpressionNode::Subexpression(_)
+        ));
 
         if let ExpressionNode::Subexpression(subexpression) = &expression.get_nodes()[4] {
             assert_eq!(subexpression.get_nodes().len(), 3);
-            assert_eq!(subexpression.get_nodes()[0], ExpressionNode::Proposition('c'));
-            assert_eq!(subexpression.get_nodes()[1], ExpressionNode::Operator(Operator::Implies));
-            assert_eq!(subexpression.get_nodes()[2], ExpressionNode::Proposition('d'));
+            assert_eq!(
+                subexpression.get_nodes()[0],
+                ExpressionNode::Proposition('c')
+            );
+            assert_eq!(
+                subexpression.get_nodes()[1],
+                ExpressionNode::Operator(Operator::Implies)
+            );
+            assert_eq!(
+                subexpression.get_nodes()[2],
+                ExpressionNode::Proposition('d')
+            );
         }
     }
 
@@ -170,16 +190,34 @@ mod tests {
 
         assert_eq!(expression.get_nodes().len(), 5);
         assert_eq!(expression.get_nodes()[0], ExpressionNode::TruthValue(true));
-        assert_eq!(expression.get_nodes()[1], ExpressionNode::Operator(Operator::And));
+        assert_eq!(
+            expression.get_nodes()[1],
+            ExpressionNode::Operator(Operator::And)
+        );
         assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('b'));
-        assert_eq!(expression.get_nodes()[3], ExpressionNode::Operator(Operator::Or));
-        assert!(matches!(expression.get_nodes()[4], ExpressionNode::Subexpression(_)));
+        assert_eq!(
+            expression.get_nodes()[3],
+            ExpressionNode::Operator(Operator::Or)
+        );
+        assert!(matches!(
+            expression.get_nodes()[4],
+            ExpressionNode::Subexpression(_)
+        ));
 
         if let ExpressionNode::Subexpression(subexpression) = &expression.get_nodes()[4] {
             assert_eq!(subexpression.get_nodes().len(), 3);
-            assert_eq!(subexpression.get_nodes()[0], ExpressionNode::TruthValue(false));
-            assert_eq!(subexpression.get_nodes()[1], ExpressionNode::Operator(Operator::Implies));
-            assert_eq!(subexpression.get_nodes()[2], ExpressionNode::Proposition('d'));
+            assert_eq!(
+                subexpression.get_nodes()[0],
+                ExpressionNode::TruthValue(false)
+            );
+            assert_eq!(
+                subexpression.get_nodes()[1],
+                ExpressionNode::Operator(Operator::Implies)
+            );
+            assert_eq!(
+                subexpression.get_nodes()[2],
+                ExpressionNode::Proposition('d')
+            );
         }
     }
 }

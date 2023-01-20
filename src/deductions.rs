@@ -70,8 +70,7 @@ impl Deduction {
     // Finds and updates all of the actual truth values of the root propositions
     // Only finds values for propositions which have been collapsed to "p" or "!p"
     // Removes the propositions whose values have been determined from the stack
-    fn update_actual_values(&mut self) {
-    }
+    fn update_actual_values(&mut self) {}
 }
 
 impl Default for ValueMap {
@@ -107,7 +106,9 @@ impl ValueMap {
 
     // Gets the value of a root proposition, if known
     pub fn get_value(&self, proposition: char) -> Option<bool> {
-        *self.values.get(&proposition).expect("[INTERNAL ERROR] Attempted to find the value of a proposition which does not exist in the ValueMap")
+        *self.values.get(&proposition)
+        .expect("[INTERNAL ERROR] Attempted to find the value of a proposition which does not exist in the ValueMap
+        Was the ValueMap initialized correctly?")
     }
 
     // Sets the value of a root proposition
