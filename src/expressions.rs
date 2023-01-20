@@ -135,7 +135,7 @@ impl Expression {
 // Returns the first subexpression found in the given expression string
 fn get_subexpression_string(expression_string: &str) -> String {
     let mut subexpression_string = String::new();
-    let mut depth = 1;
+    let mut depth = 0;
 
     for character in expression_string.chars() {
         match character {
@@ -149,12 +149,13 @@ fn get_subexpression_string(expression_string: &str) -> String {
             break;
         }
 
+        // Do not add the open parenthesis to the subexpression string
+        if depth == 1 && character == '(' {
+            continue;
+        }
+
         subexpression_string.push(character);
     }
-
-    // Remove the parentheses from the subexpression
-    subexpression_string.remove(0);
-    subexpression_string.pop();
 
     subexpression_string
 }
@@ -172,7 +173,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_complex() {
+    fn test_parse_complex_1() {
         let expression = Expression::parse_str("a ∧ b ∨ (c → d)");
 
         assert_eq!(expression.get_nodes().len(), 5);
@@ -206,6 +207,41 @@ mod tests {
                 ExpressionNode::Proposition('d')
             );
         }
+    }
+
+    #[test]
+    fn test_parse_complex_2() {
+        let expression = Expression::parse_str("(m & b) > j");
+
+        assert_eq!(expression.get_nodes().len(), 3);
+
+        assert!(matches!(
+            expression.get_nodes()[0],
+            ExpressionNode::Subexpression(_)
+        ));
+
+        if let ExpressionNode::Subexpression(subexpression) = &expression.get_nodes()[0] {
+            assert_eq!(subexpression.get_nodes().len(), 3);
+            assert_eq!(
+                subexpression.get_nodes()[0],
+                ExpressionNode::Proposition('m')
+            );
+            assert_eq!(
+                subexpression.get_nodes()[1],
+                ExpressionNode::Operator(Operator::And)
+            );
+            assert_eq!(
+                subexpression.get_nodes()[2],
+                ExpressionNode::Proposition('b')
+            );
+        }
+
+        assert_eq!(
+            expression.get_nodes()[1],
+            ExpressionNode::Operator(Operator::Implies)
+        );
+        
+        assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('j'));
     }
 
     #[test]
