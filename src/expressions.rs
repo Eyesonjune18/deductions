@@ -1,12 +1,14 @@
 use crate::ValueMap;
 
 // Represents a propositional logic expression through an abstract syntax tree
+#[derive(Debug, Eq, PartialEq)]
 pub struct Expression {
     origin_string: String,
     nodes: Vec<ExpressionNode>,
 }
 
 // Represents nodes in the expression tree
+#[derive(Debug, Eq, PartialEq)]
 pub enum ExpressionNode {
     Proposition(char),
     TruthValue(bool),
@@ -15,6 +17,7 @@ pub enum ExpressionNode {
 }
 
 // Represents one of 4 required operators for this project
+#[derive(Debug, Eq, PartialEq)]
 pub enum Operator {
     Not,
     And,
@@ -115,5 +118,41 @@ fn get_subexpression_string(expression_string: &str) -> String {
         subexpression_string.push(character);
     }
 
+    // Remove the parentheses from the subexpression
+    subexpression_string.remove(0);
+    subexpression_string.pop();
+
     subexpression_string
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_simple() {
+        let expression = Expression::parse_str("a");
+
+        assert_eq!(expression.get_nodes().len(), 1);
+        assert_eq!(expression.get_nodes()[0], ExpressionNode::Proposition('a'));
+    }
+
+    #[test]
+    fn test_parse_complex() {
+        let expression = Expression::parse_str("a ∧ b ∨ (c → d)");
+
+        assert_eq!(expression.get_nodes().len(), 5);
+        assert_eq!(expression.get_nodes()[0], ExpressionNode::Proposition('a'));
+        assert_eq!(expression.get_nodes()[1], ExpressionNode::Operator(Operator::And));
+        assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('b'));
+        assert_eq!(expression.get_nodes()[3], ExpressionNode::Operator(Operator::Or));
+        assert!(matches!(expression.get_nodes()[4], ExpressionNode::Subexpression(_)));
+
+        if let ExpressionNode::Subexpression(subexpression) = &expression.get_nodes()[4] {
+            assert_eq!(subexpression.get_nodes().len(), 3);
+            assert_eq!(subexpression.get_nodes()[0], ExpressionNode::Proposition('c'));
+            assert_eq!(subexpression.get_nodes()[1], ExpressionNode::Operator(Operator::Implies));
+            assert_eq!(subexpression.get_nodes()[2], ExpressionNode::Proposition('d'));
+        }
+    }
 }
