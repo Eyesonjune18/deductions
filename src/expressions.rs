@@ -155,4 +155,31 @@ mod tests {
             assert_eq!(subexpression.get_nodes()[2], ExpressionNode::Proposition('d'));
         }
     }
+
+    #[test]
+    fn test_substitute() {
+        let mut expression = Expression::parse_str("a ∧ b ∨ (c → d)");
+
+        let mut proposition_values = ValueMap::default();
+        proposition_values.set_value('a', Some(true));
+        proposition_values.set_value('b', None);
+        proposition_values.set_value('c', Some(false));
+        proposition_values.set_value('d', None);
+
+        expression.substitute(&proposition_values);
+
+        assert_eq!(expression.get_nodes().len(), 5);
+        assert_eq!(expression.get_nodes()[0], ExpressionNode::TruthValue(true));
+        assert_eq!(expression.get_nodes()[1], ExpressionNode::Operator(Operator::And));
+        assert_eq!(expression.get_nodes()[2], ExpressionNode::Proposition('b'));
+        assert_eq!(expression.get_nodes()[3], ExpressionNode::Operator(Operator::Or));
+        assert!(matches!(expression.get_nodes()[4], ExpressionNode::Subexpression(_)));
+
+        if let ExpressionNode::Subexpression(subexpression) = &expression.get_nodes()[4] {
+            assert_eq!(subexpression.get_nodes().len(), 3);
+            assert_eq!(subexpression.get_nodes()[0], ExpressionNode::TruthValue(false));
+            assert_eq!(subexpression.get_nodes()[1], ExpressionNode::Operator(Operator::Implies));
+            assert_eq!(subexpression.get_nodes()[2], ExpressionNode::Proposition('d'));
+        }
+    }
 }

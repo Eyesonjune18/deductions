@@ -71,38 +71,6 @@ impl Deduction {
     // Only finds values for propositions which have been collapsed to "p" or "!p"
     // Removes the propositions whose values have been determined from the stack
     fn update_actual_values(&mut self) {
-        // TODO: Rewrite this
-
-        // let mut removal_indexes: Vec<usize> = Vec::new();
-
-        // for (i, p) in self.expression_stack.iter().enumerate() {
-        //     let expression_string = p.get_string();
-
-        //     // The proposition can only be a root proposition value if it is one or two characters long
-        //     match expression_string.len() {
-        //         1 => {
-        //             // If the proposition is one character long, the first and only character
-        //             // is the root proposition ("p" etc.) and its value is TRUE
-        //             let proposition_char = expression_string.chars().next().unwrap();
-        //             self.proposition_values
-        //                 .set_value(proposition_char, Some(true));
-        //         }
-        //         2 => {
-        //             // If the proposition is two characters long, the second character
-        //             // is the root proposition ("!p" etc.) and its value is FALSE
-        //             let proposition_char = expression_string.chars().last().expect("[INTERNAL ERROR] Could not find the last character of the proposition string");
-        //             self.proposition_values
-        //                 .set_value(proposition_char, Some(false));
-        //         }
-        //         _ => continue,
-        //     };
-
-        //     removal_indexes.push(i);
-        // }
-
-        // for i in removal_indexes {
-        //     self.expression_stack.remove(i);
-        // }
     }
 }
 
@@ -143,7 +111,7 @@ impl ValueMap {
     }
 
     // Sets the value of a root proposition
-    fn set_value(&mut self, proposition: char, value: Option<bool>) {
+    pub fn set_value(&mut self, proposition: char, value: Option<bool>) {
         self.values.insert(proposition, value);
     }
 }
