@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter, Result};
+
 use crate::ValueMap;
 
 // Represents a propositional logic expression through an abstract syntax tree
@@ -25,24 +27,22 @@ pub enum Operator {
     Implies,
 }
 
-impl std::fmt::Display for Expression {
+impl Display for Expression {
     // Displays the expression as a string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // Format each node in the expression
         let mut formatted_nodes = Vec::new();
 
         for node in &self.nodes {
             formatted_nodes.push(format!("{}", node));
         }
 
-        // Join the formatted nodes into a string
         let formatted_string = formatted_nodes.join(" ");
 
         write!(f, "{}", formatted_string)
     }
 }
 
-impl std::fmt::Display for ExpressionNode {
+impl Display for ExpressionNode {
     // Displays the node as a string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -54,9 +54,9 @@ impl std::fmt::Display for ExpressionNode {
     }
 }
 
-impl std::fmt::Display for Operator {
+impl Display for Operator {
     // Displays the operator as a string
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
             Operator::Not => write!(f, "¬"),
             Operator::And => write!(f, "∧"),

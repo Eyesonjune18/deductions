@@ -70,7 +70,9 @@ impl Deduction {
     // Finds and updates all of the actual truth values of the root propositions
     // Only finds values for propositions which have been collapsed to "p" or "!p"
     // Removes the propositions whose values have been determined from the stack
-    fn update_actual_values(&mut self) {}
+    fn update_actual_values(&mut self) {
+        todo!()
+    }
 }
 
 impl Default for ValueMap {
