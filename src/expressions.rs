@@ -14,13 +14,13 @@ pub enum ExpressionNode {
     Proposition(char),
     TruthValue(bool),
     Operator(Operator),
+    Negation,
     Subexpression(Expression),
 }
 
 // Represents one of 4 required operators for this project
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum Operator {
-    Not,
     And,
     Or,
     Implies,
@@ -36,7 +36,7 @@ impl Display for Expression {
                 write!(f, "{}", node)?;
             } else {
                 match self.nodes[i - 1] {
-                    ExpressionNode::Operator(Operator::Not) => write!(f, "{}", node)?,
+                    ExpressionNode::Negation => write!(f, "{}", node)?,
                     _ => write!(f, " {}", node)?,
                 }
             }
@@ -53,6 +53,7 @@ impl Display for ExpressionNode {
             ExpressionNode::Proposition(proposition) => write!(f, "{}", proposition),
             ExpressionNode::TruthValue(value) => write!(f, "{}", value),
             ExpressionNode::Operator(operator) => write!(f, "{}", operator),
+            ExpressionNode::Negation => write!(f, "¬"),
             ExpressionNode::Subexpression(subexpression) => write!(f, "({})", subexpression),
         }
     }
@@ -62,7 +63,6 @@ impl Display for Operator {
     // Displays the operator as a string
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
-            Operator::Not => write!(f, "¬"),
             Operator::And => write!(f, "∧"),
             Operator::Or => write!(f, "∨"),
             Operator::Implies => write!(f, "→"),
@@ -98,7 +98,7 @@ impl Expression {
                     expression_chars.nth(subexpression_string.len());
                 }
                 ')' => (),
-                '¬' | '!' => nodes.push(ExpressionNode::Operator(Operator::Not)),
+                '¬' | '!' => nodes.push(ExpressionNode::Negation),
                 '∧' | '&' => nodes.push(ExpressionNode::Operator(Operator::And)),
                 '∨' | '|' => nodes.push(ExpressionNode::Operator(Operator::Or)),
                 '→' | '>' => nodes.push(ExpressionNode::Operator(Operator::Implies)),
@@ -120,7 +120,7 @@ impl Expression {
     pub fn get_value_if_root_proposition(&self) -> Option<(char, bool)> {
         match self.nodes.len() {
             1 => Some((self.nodes[0].is_proposition()?, true)),
-            2 if matches!(self.nodes[0].is_operator()?, Operator::Not) => {
+            2 if self.nodes[0].is_negation() => {
                 Some((self.nodes[1].is_proposition()?, false))
             }
             _ => None,
@@ -185,6 +185,13 @@ impl ExpressionNode {
         match self {
             ExpressionNode::Operator(o) => Some(*o),
             _ => None,
+        }
+    }
+
+    fn is_negation(&self) -> bool {
+        match self {
+            ExpressionNode::Negation => true,
+            _ => false,
         }
     }
 }
