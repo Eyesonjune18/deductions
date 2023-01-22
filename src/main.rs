@@ -1,13 +1,13 @@
 #![allow(dead_code, unused_variables)]
 
 mod deductions;
-mod expressions;
+mod premises;
 mod history;
 
 use deductions::Deduction;
 use deductions::ValueMap;
-use expressions::Premise;
-use expressions::PremiseNode;
+use premises::Premise;
+use premises::PremiseNode;
 
 fn main() {
     let propositions = ["(m & b) > j", "(f | s) > m", "b > t", "f > !t", "f"].to_vec();
