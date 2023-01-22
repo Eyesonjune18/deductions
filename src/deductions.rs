@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::Expression;
-use crate::ExpressionNode;
+use crate::Premise;
+use crate::PremiseNode;
 
-// Stores all the given or working expressions on a stack
+// Stores all the given or working premises on a stack
 pub struct Deduction {
-    expression_stack: Vec<Expression>,
+    premise_stack: Vec<Premise>,
     proposition_values: ValueMap,
 }
 
@@ -18,8 +18,8 @@ pub struct ValueMap {
 impl std::fmt::Display for Deduction {
     // Displays all the propositions in the Deduction
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for expression in &self.expression_stack {
-            writeln!(f, "{}", expression)?;
+        for premise in &self.premise_stack {
+            writeln!(f, "{}", premise)?;
         }
 
         Ok(())
@@ -30,7 +30,7 @@ impl Default for Deduction {
     // Creates an empty Deduction
     fn default() -> Self {
         Self {
-            expression_stack: Vec::new(),
+            premise_stack: Vec::new(),
             proposition_values: ValueMap::default(),
         }
     }
@@ -38,27 +38,27 @@ impl Default for Deduction {
 
 impl Deduction {
     // Creates a new Deduction from the given fields
-    fn new(expression_stack: Vec<Expression>, proposition_values: ValueMap) -> Self {
+    fn new(premise_stack: Vec<Premise>, proposition_values: ValueMap) -> Self {
         Self {
-            expression_stack,
+            premise_stack,
             proposition_values,
         }
     }
 
-    // Creates a Deduction from a vector of expressions
-    pub fn from_strs(expressions: Vec<&str>) -> Self {
-        let expression_stack: Vec<Expression> = expressions
+    // Creates a Deduction from a vector of premises
+    pub fn from_strs(premises: Vec<&str>) -> Self {
+        let premise_stack: Vec<Premise> = premises
             .iter()
-            .map(|x| Expression::parse_str(x))
+            .map(|x| Premise::parse_str(x))
             .collect();
-        let proposition_values = ValueMap::from_expression_stack(&expression_stack);
+        let proposition_values = ValueMap::from_premise_stack(&premise_stack);
 
-        Self::new(expression_stack, proposition_values)
+        Self::new(premise_stack, proposition_values)
     }
 
     // Checks if the Deduction is empty
     fn is_empty(&self) -> bool {
-        self.expression_stack.is_empty()
+        self.premise_stack.is_empty()
     }
 
     // Returns the proposition values
@@ -69,8 +69,8 @@ impl Deduction {
     // Substitutes all root propositions with their actual truth values, if known
     // * This should not be public but it is for testing purposes *
     pub fn substitute_all(&mut self) {
-        for expression in &mut self.expression_stack {
-            expression.substitute(&self.proposition_values);
+        for premise in &mut self.premise_stack {
+            premise.substitute(&self.proposition_values);
         }
     }
 
@@ -80,8 +80,8 @@ impl Deduction {
     // * This should not be public but it is for testing purposes *
     // TODO: Write test cases for this!
     pub fn update_actual_values(&mut self) {
-        for expression in &mut self.expression_stack {
-            if let Some((proposition_char, proposition_value)) = expression.get_value_if_root_proposition() {
+        for premise in &mut self.premise_stack {
+            if let Some((proposition_char, proposition_value)) = premise.get_value_if_root_proposition() {
                 self.proposition_values.set_value(proposition_char, Some(proposition_value));
             }
         }
@@ -105,25 +105,25 @@ impl ValueMap {
 
     // Finds all the root propositions in the given stack and initializes them to None
     // This is used to create a Deduction from a vector of propositions
-    fn from_expression_stack(expression_stack: &Vec<Expression>) -> Self {
+    fn from_premise_stack(premise_stack: &Vec<Premise>) -> Self {
         let mut values = HashMap::new();
 
-        fn inner<'a>(values: &mut HashMap<char, Option<bool>>, expression: impl Iterator<Item = &'a ExpressionNode>) {
-            for node in expression {
+        fn inner<'a>(values: &mut HashMap<char, Option<bool>>, premise: impl Iterator<Item = &'a PremiseNode>) {
+            for node in premise {
                 match node {
-                    ExpressionNode::Proposition(proposition_char) => {
+                    PremiseNode::Proposition(proposition_char) => {
                         values.insert(*proposition_char, None);
                     },
-                    ExpressionNode::Subexpression(subexpression) => {
-                        inner(values, subexpression.get_nodes().iter());
+                    PremiseNode::Subpremise(subpremise) => {
+                        inner(values, subpremise.get_nodes().iter());
                     },
                     _ => (),
                 }
             }
         }
         
-        for expression in expression_stack {
-            inner(&mut values, expression.get_nodes().iter());
+        for premise in premise_stack {
+            inner(&mut values, premise.get_nodes().iter());
         }
 
         Self { values }

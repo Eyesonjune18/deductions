@@ -6,8 +6,8 @@ mod history;
 
 use deductions::Deduction;
 use deductions::ValueMap;
-use expressions::Expression;
-use expressions::ExpressionNode;
+use expressions::Premise;
+use expressions::PremiseNode;
 
 fn main() {
     let propositions = ["(m & b) > j", "(f | s) > m", "b > t", "f > !t", "f"].to_vec();
@@ -20,6 +20,7 @@ fn main() {
 }
 
 /*
+
 (m ∧ ¬b) → j
 (f ∨ s) → m
 b → t
@@ -66,4 +67,5 @@ TRUE → j [EVALUATE]
 
 =>
 j = TRUE [EVALUATE]
+
 */
