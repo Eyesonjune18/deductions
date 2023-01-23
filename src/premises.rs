@@ -18,7 +18,7 @@ pub enum PremiseNode {
     Subpremise(Premise),
 }
 
-// Represents one of 4 required operators for this project
+// Represents one of 3 required binary operators for this project
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum Operator {
     And,
