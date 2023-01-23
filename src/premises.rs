@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter, Result};
 
 use crate::ValueMap;
 
-// Represents a propositional logic premise through an abstract syntax tree
+// Represents a propositional logic premise through a concrete syntax tree
 #[derive(Debug, Eq, PartialEq)]
 pub struct Premise {
     nodes: Vec<PremiseNode>,
