@@ -1,8 +1,8 @@
-#![allow(dead_code, unused_variables)]
+// #![allow(dead_code, unused_variables)]
 
 mod deductions;
-mod premises;
 mod history;
+mod premises;
 
 use deductions::Deduction;
 use deductions::ValueMap;

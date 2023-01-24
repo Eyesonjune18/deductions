@@ -90,9 +90,7 @@ impl Premise {
                     // Collect the subpremise string to be parsed
                     let subpremise_string = get_subpremise_string(&premise_string[i..]);
 
-                    nodes.push(PremiseNode::Subpremise(Self::parse_str(
-                        &subpremise_string,
-                    )));
+                    nodes.push(PremiseNode::Subpremise(Self::parse_str(&subpremise_string)));
 
                     // Skip the characters in the subpremise
                     premise_chars.nth(subpremise_string.len());
@@ -115,14 +113,27 @@ impl Premise {
         &self.nodes
     }
 
+    // Returns the number of operators in the Premise
+    pub fn get_num_operators(&self) -> usize {
+        self.nodes.iter().filter(|node| node.is_operator()).count()
+    }
+
+    // Returns the number of operands in the Premise
+    pub fn get_num_operands(&self) -> usize {
+        self.nodes.iter().filter(|node| node.is_operand()).count()
+    }
+
+    // Checks whether the Premise is syntactically valid
+    pub fn validate(&self) -> bool {
+        todo!()
+    }
+
     // Checks whether a given Premise is a root proposition such as "p" or "¬p",
     // and if it is, returns the proposition's character and its truth value
     pub fn get_value_if_root_proposition(&self) -> Option<(char, bool)> {
         match self.nodes.len() {
             1 => Some((self.nodes[0].is_proposition()?, true)),
-            2 if self.nodes[0].is_negation() => {
-                Some((self.nodes[1].is_proposition()?, false))
-            }
+            2 if self.nodes[0].is_negation() => Some((self.nodes[1].is_proposition()?, false)),
             _ => None,
         }
     }
@@ -194,16 +205,25 @@ impl PremiseNode {
         }
     }
 
-    fn is_operator(&self) -> Option<Operator> {
+    fn is_operator(&self) -> bool {
         match self {
-            PremiseNode::Operator(o) => Some(*o),
-            _ => None,
+            PremiseNode::Operator(o) => true,
+            _ => false,
         }
     }
 
     fn is_negation(&self) -> bool {
         match self {
             PremiseNode::Negation => true,
+            _ => false,
+        }
+    }
+
+    fn is_operand(&self) -> bool {
+        match self {
+            PremiseNode::Proposition(_)
+            | PremiseNode::Subpremise(_)
+            | PremiseNode::TruthValue(_) => true,
             _ => false,
         }
     }
@@ -227,34 +247,19 @@ mod tests {
 
         assert_eq!(premise.get_nodes().len(), 5);
         assert_eq!(premise.get_nodes()[0], PremiseNode::Proposition('a'));
-        assert_eq!(
-            premise.get_nodes()[1],
-            PremiseNode::Operator(Operator::And)
-        );
+        assert_eq!(premise.get_nodes()[1], PremiseNode::Operator(Operator::And));
         assert_eq!(premise.get_nodes()[2], PremiseNode::Proposition('b'));
-        assert_eq!(
-            premise.get_nodes()[3],
-            PremiseNode::Operator(Operator::Or)
-        );
-        assert!(matches!(
-            premise.get_nodes()[4],
-            PremiseNode::Subpremise(_)
-        ));
+        assert_eq!(premise.get_nodes()[3], PremiseNode::Operator(Operator::Or));
+        assert!(matches!(premise.get_nodes()[4], PremiseNode::Subpremise(_)));
 
         if let PremiseNode::Subpremise(subpremise) = &premise.get_nodes()[4] {
             assert_eq!(subpremise.get_nodes().len(), 3);
-            assert_eq!(
-                subpremise.get_nodes()[0],
-                PremiseNode::Proposition('c')
-            );
+            assert_eq!(subpremise.get_nodes()[0], PremiseNode::Proposition('c'));
             assert_eq!(
                 subpremise.get_nodes()[1],
                 PremiseNode::Operator(Operator::Implies)
             );
-            assert_eq!(
-                subpremise.get_nodes()[2],
-                PremiseNode::Proposition('d')
-            );
+            assert_eq!(subpremise.get_nodes()[2], PremiseNode::Proposition('d'));
         }
     }
 
@@ -264,25 +269,16 @@ mod tests {
 
         assert_eq!(premise.get_nodes().len(), 3);
 
-        assert!(matches!(
-            premise.get_nodes()[0],
-            PremiseNode::Subpremise(_)
-        ));
+        assert!(matches!(premise.get_nodes()[0], PremiseNode::Subpremise(_)));
 
         if let PremiseNode::Subpremise(subpremise) = &premise.get_nodes()[0] {
             assert_eq!(subpremise.get_nodes().len(), 3);
-            assert_eq!(
-                subpremise.get_nodes()[0],
-                PremiseNode::Proposition('m')
-            );
+            assert_eq!(subpremise.get_nodes()[0], PremiseNode::Proposition('m'));
             assert_eq!(
                 subpremise.get_nodes()[1],
                 PremiseNode::Operator(Operator::And)
             );
-            assert_eq!(
-                subpremise.get_nodes()[2],
-                PremiseNode::Proposition('b')
-            );
+            assert_eq!(subpremise.get_nodes()[2], PremiseNode::Proposition('b'));
         }
 
         assert_eq!(
@@ -291,6 +287,27 @@ mod tests {
         );
 
         assert_eq!(premise.get_nodes()[2], PremiseNode::Proposition('j'));
+    }
+
+    #[test]
+    fn test_validate() {
+        let mut premise = Premise::parse_str("a ∧ b ∨ (c → d)");
+        assert!(premise.validate());
+
+        premise = Premise::parse_str("a ∧ b ∨ ¬¬(c → d");
+        assert!(premise.validate());
+
+        premise = Premise::parse_str("a ¬∧ b ∨ (c → d");
+        assert!(!premise.validate());
+
+        premise = Premise::parse_str("a ∧∧ b ∨ (c → d)");
+        assert!(!premise.validate());
+
+        premise = Premise::parse_str("a ∧ b ∨ (c → d) ∧");
+        assert!(!premise.validate());
+
+        premise = Premise::parse_str("a ∧ b ∨ (c → d ∧)");
+        assert!(!premise.validate());
     }
 
     #[test]
@@ -307,34 +324,19 @@ mod tests {
 
         assert_eq!(premise.get_nodes().len(), 5);
         assert_eq!(premise.get_nodes()[0], PremiseNode::TruthValue(true));
-        assert_eq!(
-            premise.get_nodes()[1],
-            PremiseNode::Operator(Operator::And)
-        );
+        assert_eq!(premise.get_nodes()[1], PremiseNode::Operator(Operator::And));
         assert_eq!(premise.get_nodes()[2], PremiseNode::Proposition('b'));
-        assert_eq!(
-            premise.get_nodes()[3],
-            PremiseNode::Operator(Operator::Or)
-        );
-        assert!(matches!(
-            premise.get_nodes()[4],
-            PremiseNode::Subpremise(_)
-        ));
+        assert_eq!(premise.get_nodes()[3], PremiseNode::Operator(Operator::Or));
+        assert!(matches!(premise.get_nodes()[4], PremiseNode::Subpremise(_)));
 
         if let PremiseNode::Subpremise(subpremise) = &premise.get_nodes()[4] {
             assert_eq!(subpremise.get_nodes().len(), 3);
-            assert_eq!(
-                subpremise.get_nodes()[0],
-                PremiseNode::TruthValue(false)
-            );
+            assert_eq!(subpremise.get_nodes()[0], PremiseNode::TruthValue(false));
             assert_eq!(
                 subpremise.get_nodes()[1],
                 PremiseNode::Operator(Operator::Implies)
             );
-            assert_eq!(
-                subpremise.get_nodes()[2],
-                PremiseNode::Proposition('d')
-            );
+            assert_eq!(subpremise.get_nodes()[2], PremiseNode::Proposition('d'));
         }
     }
 }

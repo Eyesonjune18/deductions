@@ -47,10 +47,7 @@ impl Deduction {
 
     // Creates a Deduction from a vector of premises
     pub fn from_strs(premises: Vec<&str>) -> Self {
-        let premise_stack: Vec<Premise> = premises
-            .iter()
-            .map(|x| Premise::parse_str(x))
-            .collect();
+        let premise_stack: Vec<Premise> = premises.iter().map(|x| Premise::parse_str(x)).collect();
         let proposition_values = ValueMap::from_premise_stack(&premise_stack);
 
         Self::new(premise_stack, proposition_values)
@@ -81,8 +78,11 @@ impl Deduction {
     // TODO: Write test cases for this!
     pub fn update_actual_values(&mut self) {
         for premise in &mut self.premise_stack {
-            if let Some((proposition_char, proposition_value)) = premise.get_value_if_root_proposition() {
-                self.proposition_values.set_value(proposition_char, Some(proposition_value));
+            if let Some((proposition_char, proposition_value)) =
+                premise.get_value_if_root_proposition()
+            {
+                self.proposition_values
+                    .set_value(proposition_char, Some(proposition_value));
             }
         }
     }
@@ -108,20 +108,23 @@ impl ValueMap {
     fn from_premise_stack(premise_stack: &Vec<Premise>) -> Self {
         let mut values = HashMap::new();
 
-        fn inner<'a>(values: &mut HashMap<char, Option<bool>>, premise: impl Iterator<Item = &'a PremiseNode>) {
+        fn inner<'a>(
+            values: &mut HashMap<char, Option<bool>>,
+            premise: impl Iterator<Item = &'a PremiseNode>,
+        ) {
             for node in premise {
                 match node {
                     PremiseNode::Proposition(proposition_char) => {
                         values.insert(*proposition_char, None);
-                    },
+                    }
                     PremiseNode::Subpremise(subpremise) => {
                         inner(values, subpremise.get_nodes().iter());
-                    },
+                    }
                     _ => (),
                 }
             }
         }
-        
+
         for premise in premise_stack {
             inner(&mut values, premise.get_nodes().iter());
         }
